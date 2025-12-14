@@ -1,3 +1,15 @@
+server:
+  port: 8081  # Auth Service będzie działał na porcie 8081
+
 spring:
   application:
     name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_db
+    username: admin
+    password: admin_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Automatycznie stworzy tabele w bazie
+    show-sql: true

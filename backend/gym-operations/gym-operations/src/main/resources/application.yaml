@@ -1,3 +1,15 @@
+server:
+  port: 8082 # Operations Service na porcie 8082
+
 spring:
   application:
     name: gym-operations
+  datasource:
+    url: jdbc:postgresql://localhost:5433/operations_db
+    username: admin
+    password: admin_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
