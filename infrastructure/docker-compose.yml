@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Baza danych dla Serwisu Auth (Użytkownicy)
+  # Baza danych dla Serwisu Auth (Użytkownicy) -> PORT 5431
   auth-db:
     image: postgres:15-alpine
     container_name: fitflow-auth-db
@@ -10,13 +10,13 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin_password
     ports:
-      - "5432:5432"
+      - "5431:5432"
     volumes:
       - auth_data:/var/lib/postgresql/data
     networks:
       - fitflow-network
 
-  # Baza danych dla Serwisu Operations (Rezerwacje)
+  # Baza danych dla Serwisu Operations (Rezerwacje) -> PORT 5433
   operations-db:
     image: postgres:15-alpine
     container_name: fitflow-ops-db
@@ -25,7 +25,7 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin_password
     ports:
-      - "5433:5432" # Zmapowane na port 5433, żeby nie gryzło się z auth-db
+      - "5433:5432"
     volumes:
       - operations_data:/var/lib/postgresql/data
     networks:
