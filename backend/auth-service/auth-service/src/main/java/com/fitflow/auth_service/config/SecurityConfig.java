@@ -16,10 +16,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Wyłączamy CSRF dla testów w Postmanie
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Pozwól każdemu wejść na endpointy autoryzacji
-                        .anyRequest().authenticated() // Reszta wymaga logowania
+                        // Lista otwartych drzwi:
+                        .requestMatchers(
+                                "/api/auth/**",       // Rejestracja i logowanie
+                                "/v3/api-docs/**",    // Dane dla Swaggera
+                                "/swagger-ui/**",     // Wygląd Swaggera
+                                "/swagger-ui.html"    // Strona startowa Swaggera
+                        ).permitAll()
+                        .anyRequest().authenticated() // Wszystko inne wymaga logowania
                 );
 
         return http.build();
@@ -27,6 +33,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Standardowe szyfrowanie haseł
+        return new BCryptPasswordEncoder();
     }
 }
