@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Transient;
 
 @Data
 @Builder
@@ -14,6 +16,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "gym_classes")
 public class GymClass {
+
+    @Transient // Ta adnotacja sprawia, że pole NIE zostanie stworzone w bazie danych
+    @JsonProperty("availableSpots") // Taką nazwę zobaczy React
+    private long availableSpots;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

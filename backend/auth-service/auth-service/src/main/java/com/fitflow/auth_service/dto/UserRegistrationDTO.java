@@ -1,5 +1,6 @@
 package com.fitflow.auth_service.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,4 +13,6 @@ public class UserRegistrationDTO {
     private String password;
     private String firstName;
     private String lastName;
+    @JsonProperty("isAdmin")
+    private boolean isAdmin;
 }

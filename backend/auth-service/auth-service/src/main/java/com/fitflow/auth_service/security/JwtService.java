@@ -19,8 +19,11 @@ public class JwtService {
     // Musi być długi (min 256 bitów)!
     private static final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
 
-    public String generateToken(String username) {
-        return createToken(new HashMap<>(), username);
+    public String generateToken(String username, Long userId, java.util.Collection<String> roles) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("roles", roles); // <--- DODAJEMY ROLE DO TOKENA
+        return createToken(claims, username);
     }
 
     private String createToken(Map<String, Object> claims, String subject) {

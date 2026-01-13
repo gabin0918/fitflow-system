@@ -25,12 +25,19 @@ public class AuthService {
             throw new RuntimeException("Email jest już zajęty!");
         }
 
+        // LOGIKA RÓL:
+        Set<String> roles = new java.util.HashSet<>();
+        roles.add("ROLE_CLIENT"); // Każdy jest klientem
+        if (dto.isAdmin()) {
+            roles.add("ROLE_ADMIN"); // Jeśli zaznaczył checkbox, staje się adminem
+        }
+
         User user = User.builder()
                 .email(dto.getEmail())
                 .password(passwordEncoder.encode(dto.getPassword()))
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
-                .roles(Set.of("ROLE_CLIENT"))
+                .roles(roles) // <--- PRZYPISUJEMY ZESTAW RÓL
                 .build();
 
         userRepository.save(user);
@@ -38,16 +45,14 @@ public class AuthService {
 
     // Metoda Logowania (NOWA)
     public String login(LoginRequestDTO dto) {
-        // 1. Szukamy użytkownika w bazie
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Nieprawidłowy email lub hasło"));
 
-        // 2. Sprawdzamy czy hasło pasuje (to zaszyfrowane z tym podanym)
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new RuntimeException("Nieprawidłowy email lub hasło");
         }
 
-        // 3. Jeśli wszystko ok -> generujemy token
-        return jwtService.generateToken(user.getEmail());
+
+        return jwtService.generateToken(user.getEmail(), user.getId(), user.getRoles());
     }
 }
