@@ -36,4 +36,10 @@ public class JwtUtils {
     public java.util.List<String> extractRoles(String token) {
         return (java.util.List<String>) getClaims(token).get("roles");
     }
+
+    // Nowa metoda helper do sprawdzenia czy user ma konkretną rolę
+    public boolean hasRole(String token, String roleName) {
+        java.util.List<String> roles = extractRoles(token);
+        return roles != null && roles.contains(roleName);
+    }
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data // To generuje gettery, settery, toString (dzięki Lombok)
@@ -28,9 +29,13 @@ public class User {
     private String firstName;
     private String lastName;
 
-    // Prosta obsługa ról jako String (np. "ROLE_CLIENT", "ROLE_ADMIN")
-    // W raporcie masz relację do tabeli Role, ale na start zrobimy to prościej,
-    // żeby szybko zadziałało. Potem wydzielimy Entity Roli.
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> roles;
+    // Relacja Many-to-Many z Role
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
 }

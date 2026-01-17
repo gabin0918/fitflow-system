@@ -13,6 +13,6 @@ public class UserRegistrationDTO {
     private String password;
     private String firstName;
     private String lastName;
-    @JsonProperty("isAdmin")
-    private boolean isAdmin;
+    @JsonProperty("isTrainer")
+    private boolean isTrainer;
 }

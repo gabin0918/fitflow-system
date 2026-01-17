@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import api from './api';
 
 function App() {
-  const [formData, setFormData] = useState({ email: '', password: '', firstName: '', lastName: '', isAdmin: false });
+  const [formData, setFormData] = useState({ email: '', password: '', firstName: '', lastName: '', isTrainer: false });
   const [isLogin, setIsLogin] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [classes, setClasses] = useState([]);
   const [myBookings, setMyBookings] = useState([]);
 
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isTrainer, setIsTrainer] = useState(false);
   const [newClass, setNewClass] = useState({ name: '', trainerName: '', dateTime: '', capacity: 20 });
 
   const fetchData = () => {
@@ -16,9 +16,9 @@ function App() {
       try {
         // Dekodujemy token, aby sprawdzić role
         const payload = JSON.parse(atob(token.split('.')[1]));
-          console.log("Zawartość Twojego tokena:", payload);
-        if (payload.roles && (payload.roles.includes('ROLE_ADMIN') || payload.roles.includes('ADMIN'))) {
-          setIsAdmin(true);
+        console.log("Zawartość Twojego tokena:", payload);
+        if (payload.roles && payload.roles.includes('ROLE_TRAINER')) {
+          setIsTrainer(true);
         }
       } catch(e) { console.error("Błąd dekodowania tokena", e); }
 
@@ -39,7 +39,7 @@ function App() {
         localStorage.setItem('token', res.data);
         setToken(res.data);
       } else {
-        // Rejestracja z opcją isAdmin
+        // Rejestracja z opcją isTrainer
         await api.post('/auth/register', formData);
         setIsLogin(true);
         alert('Zarejestrowano pomyślnie! Teraz się zaloguj.');
@@ -78,10 +78,10 @@ function App() {
       <div style={{ padding: '20px', fontFamily: 'Arial' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <h1>FitFlow Dashboard</h1>
-            <button onClick={() => { localStorage.removeItem('token'); setToken(null); setIsAdmin(false); }}>Wyloguj</button>
+            <button onClick={() => { localStorage.removeItem('token'); setToken(null); setIsTrainer(false); }}>Wyloguj</button>
         </div>
 
-        {isAdmin && (
+        {isTrainer && (
           <div style={{ background: '#fff3cd', padding: '20px', borderRadius: '10px', marginBottom: '30px', border: '1px solid #ffeeba' }}>
             <h3>Panel Trenera: Dodaj Zajęcia</h3>
             <form onSubmit={handleAddClass} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
@@ -130,8 +130,8 @@ function App() {
                 <input placeholder="Imię" style={{display: 'block', marginBottom: '10px', width: '250px'}} onChange={e => setFormData({...formData, firstName: e.target.value})} />
                 <input placeholder="Nazwisko" style={{display: 'block', marginBottom: '10px', width: '250px'}} onChange={e => setFormData({...formData, lastName: e.target.value})} />
                 <label style={{fontSize: '12px', display: 'block', marginBottom: '10px'}}>
-                    <input type="checkbox" onChange={e => setFormData({...formData, isAdmin: e.target.checked})} />
-                    Zarejestruj jako Trener (Admin)
+                    <input type="checkbox" onChange={e => setFormData({...formData, isTrainer: e.target.checked})} />
+                    Zarejestruj jako Trener
                 </label>
             </>
         )}
