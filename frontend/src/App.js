@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from './api';
+import ProfilePage from './ProfilePage';
 
 function App() {
   const [formData, setFormData] = useState({ email: '', password: '', firstName: '', lastName: '', isTrainer: false });
@@ -10,6 +11,7 @@ function App() {
 
   const [isTrainer, setIsTrainer] = useState(false);
   const [newClass, setNewClass] = useState({ name: '', trainerName: '', dateTime: '', capacity: 20 });
+  const [showProfile, setShowProfile] = useState(false);
 
   const fetchData = () => {
     if (token) {
@@ -74,11 +76,18 @@ function App() {
   };
 
   if (token) {
+    if (showProfile) {
+      return <ProfilePage token={token} setToken={setToken} setShowProfile={setShowProfile} />;
+    }
+
     return (
       <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1>FitFlow Dashboard</h1>
-            <button onClick={() => { localStorage.removeItem('token'); setToken(null); setIsTrainer(false); }}>Wyloguj</button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setShowProfile(true)} style={{ padding: '10px 20px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Mój Profil</button>
+              <button onClick={() => { localStorage.removeItem('token'); setToken(null); setIsTrainer(false); }} style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Wyloguj</button>
+            </div>
         </div>
 
         {isTrainer && (
