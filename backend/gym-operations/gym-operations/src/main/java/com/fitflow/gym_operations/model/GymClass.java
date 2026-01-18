@@ -29,7 +29,11 @@ public class GymClass {
     private String name; // np. "Joga", "Crossfit"
 
     @Column(nullable = false)
-    private String trainerName; // Imię trenera
+    private Long trainerId; // ID trenera z auth-service
+
+    @Transient // To pole jest tylko do przesyłania danych (nie zapisuje się w bazie)
+    @JsonProperty("trainerName")
+    private String trainerName; // Imię trenera - pobierane z auth-service
 
     @Column(nullable = false)
     private LocalDateTime dateTime; // Kiedy odbywają się zajęcia
