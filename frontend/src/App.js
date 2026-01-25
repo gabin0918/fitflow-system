@@ -10,8 +10,9 @@ function App() {
   const [myBookings, setMyBookings] = useState([]);
 
   const [isTrainer, setIsTrainer] = useState(false);
-  const [newClass, setNewClass] = useState({ name: '', trainerName: '', dateTime: '', capacity: 20 });
+  const [newClass, setNewClass] = useState({ name: '', trainerId: null, dateTime: '', capacity: 20 });
   const [showProfile, setShowProfile] = useState(false);
+  const [trainers, setTrainers] = useState([]);
 
   const fetchData = () => {
     if (token) {
@@ -26,6 +27,17 @@ function App() {
 
       api.get('/gym/classes').then(res => setClasses(res.data));
       api.get('/gym/bookings/my').then(res => setMyBookings(res.data));
+
+      // Pobierz listę dostępnych trenerów
+      api.get('/gym/classes/available-trainers')
+        .then(res => {
+          console.log('Trainers loaded:', res.data);
+          setTrainers(res.data);
+        })
+        .catch(err => {
+          console.error('Error loading trainers:', err);
+          setTrainers([]);
+        });
     }
   };
 
@@ -52,9 +64,14 @@ function App() {
   const handleAddClass = async (e) => {
     e.preventDefault();
     try {
+      if (!newClass.name || !newClass.trainerId || !newClass.dateTime) {
+        alert('Proszę wypełnić wszystkie pola');
+        return;
+      }
+
       await api.post('/gym/classes', newClass);
       alert('Dodano nowe zajęcia!');
-      setNewClass({ name: '', trainerName: '', dateTime: '', capacity: 20 });
+      setNewClass({ name: '', trainerId: null, dateTime: '', capacity: 20 });
       fetchData(); // Odśwież listę
     } catch (err) { alert('Błąd: ' + (err.response?.data || err.message)); }
   };
@@ -93,12 +110,26 @@ function App() {
         {isTrainer && (
           <div style={{ background: '#fff3cd', padding: '20px', borderRadius: '10px', marginBottom: '30px', border: '1px solid #ffeeba' }}>
             <h3>Panel Trenera: Dodaj Zajęcia</h3>
-            <form onSubmit={handleAddClass} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <input placeholder="Nazwa" value={newClass.name} onChange={e => setNewClass({...newClass, name: e.target.value})} required />
-              <input placeholder="Trener" value={newClass.trainerName} onChange={e => setNewClass({...newClass, trainerName: e.target.value})} required />
-              <input type="datetime-local" value={newClass.dateTime} onChange={e => setNewClass({...newClass, dateTime: e.target.value})} required />
-              <input type="number" placeholder="Miejsca" value={newClass.capacity} onChange={e => setNewClass({...newClass, capacity: e.target.value})} required />
-              <button type="submit" style={{ background: '#856404', color: 'white', border: 'none', padding: '5px 15px', borderRadius: '5px', cursor: 'pointer' }}>Opublikuj</button>
+            <form onSubmit={handleAddClass} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+              <input placeholder="Nazwa" value={newClass.name} onChange={e => setNewClass({...newClass, name: e.target.value})} required style={{ padding: '8px' }} />
+
+              <select
+                value={newClass.trainerId || ''}
+                onChange={e => setNewClass({...newClass, trainerId: e.target.value ? parseInt(e.target.value) : null})}
+                required
+                style={{ padding: '8px', minWidth: '150px' }}
+              >
+                <option value="">-- Wybierz trenera --</option>
+                {trainers.map(trainer => (
+                  <option key={trainer.id} value={trainer.id}>
+                    {trainer.firstName} {trainer.lastName}
+                  </option>
+                ))}
+              </select>
+
+              <input type="datetime-local" value={newClass.dateTime} onChange={e => setNewClass({...newClass, dateTime: e.target.value})} required style={{ padding: '8px' }} />
+              <input type="number" placeholder="Miejsca" value={newClass.capacity} onChange={e => setNewClass({...newClass, capacity: parseInt(e.target.value) || 20})} required style={{ padding: '8px' }} />
+              <button type="submit" style={{ background: '#856404', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>Opublikuj</button>
             </form>
           </div>
         )}
