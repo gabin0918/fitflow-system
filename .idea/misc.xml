@@ -7,6 +7,7 @@
         <option value="$PROJECT_DIR$/backend/auth-service/auth-service/pom.xml" />
         <option value="$PROJECT_DIR$/backend/gym-operations/gym-operations/pom.xml" />
         <option value="$PROJECT_DIR$/backend/api-gateway/api-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/membership-payment-service/membership-payment-service/pom.xml" />
       </list>
     </option>
   </component>

@@ -43,6 +43,27 @@ services:
       retries: 5
     restart: unless-stopped
 
+  # Baza danych dla Membership & Payment Service -> PORT 5434
+  membership-db:
+    image: postgres:15-alpine
+    container_name: fitflow-membership-db
+    environment:
+      POSTGRES_DB: membership_payment_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - membership_data:/var/lib/postgresql/data
+    networks:
+      - fitflow-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d membership_payment_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   # pgAdmin - Web UI do zarządzania bazami danych
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -60,6 +81,7 @@ services:
     depends_on:
       - auth-db
       - operations-db
+      - membership-db
     restart: unless-stopped
 
 networks:
@@ -70,6 +92,8 @@ volumes:
   auth_data:
     driver: local
   operations_data:
+    driver: local
+  membership_data:
     driver: local
   pgadmin_data:
     driver: local

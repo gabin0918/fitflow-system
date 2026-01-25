@@ -9,7 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
       </profile>
-      <profile name="Annotation profile for gym-operations" enabled="true">
+      <profile name="Annotation profile for membership-payment-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -18,6 +18,7 @@
         </processorPath>
         <module name="gym-operations" />
         <module name="auth-service" />
+        <module name="membership-payment-service" />
       </profile>
     </annotationProcessing>
   </component>
@@ -26,6 +27,7 @@
       <module name="api-gateway" options="-parameters" />
       <module name="auth-service" options="-parameters" />
       <module name="gym-operations" options="-parameters" />
+      <module name="membership-payment-service" options="-parameters" />
     </option>
   </component>
 </project>
