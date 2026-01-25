@@ -13,6 +13,9 @@ public class UserRegistrationDTO {
     private String password;
     private String firstName;
     private String lastName;
+
     @JsonProperty("isTrainer")
     private boolean isTrainer;
+
+    private String adminCode;
 }

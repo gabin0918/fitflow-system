@@ -26,24 +26,23 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    // Metoda Rejestracji
     public void registerUser(UserRegistrationDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Email jest już zajęty!");
         }
 
-        // LOGIKA RÓL:
         Set<Role> roles = new HashSet<>();
-
-        // Każdy użytkownik dostaje ROLE_CLIENT
         Role clientRole = roleRepository.findByName("ROLE_CLIENT")
-                .orElseThrow(() -> new RuntimeException("Rola ROLE_CLIENT nie istnieje w bazie!"));
+                .orElseThrow(() -> new RuntimeException("Rola ROLE_CLIENT nie istnieje!"));
         roles.add(clientRole);
 
-        // Jeśli zaznaczył checkbox isTrainer, dostaje ROLE_TRAINER
+        // NASZA ZMIANA: Zabezpieczenie kodu trenera
         if (dto.isTrainer()) {
+            if (!"FITFLOW2026".equals(dto.getAdminCode())) {
+                throw new RuntimeException("Nieprawidłowy kod autoryzacji trenera!");
+            }
             Role trainerRole = roleRepository.findByName("ROLE_TRAINER")
-                    .orElseThrow(() -> new RuntimeException("Rola ROLE_TRAINER nie istnieje w bazie!"));
+                    .orElseThrow(() -> new RuntimeException("Rola ROLE_TRAINER nie istnieje!"));
             roles.add(trainerRole);
         }
 
@@ -58,39 +57,23 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    // Metoda Logowania
     public String login(LoginRequestDTO dto) {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new RuntimeException("Nieprawidłowy email lub hasło"));
-
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new RuntimeException("Nieprawidłowy email lub hasło");
         }
-
         return jwtService.generateToken(user.getEmail(), user.getId(), user.getRoles());
     }
 
-    // Pobierz użytkownika po ID
     public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Użytkownik o ID " + id + " nie istnieje"));
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie ma usera"));
     }
 
-    // Pobierz listę trenerów (użytkowników z rolą ROLE_TRAINER)
     public List<TrainerDTO> getTrainersList() {
-        List<User> allUsers = userRepository.findAll();
-
-        return allUsers.stream()
-                .filter(user -> user.getRoles().stream()
-                        .anyMatch(role -> "ROLE_TRAINER".equals(role.getName())))
-                .map(user -> TrainerDTO.builder()
-                        .id(user.getId())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .email(user.getEmail())
-                        .bio(user.getBio())
-                        .phoneNumber(user.getPhoneNumber())
-                        .build())
+        return userRepository.findAll().stream()
+                .filter(u -> u.getRoles().stream().anyMatch(r -> "ROLE_TRAINER".equals(r.getName())))
+                .map(u -> TrainerDTO.builder().id(u.getId()).firstName(u.getFirstName()).lastName(u.getLastName()).build())
                 .collect(Collectors.toList());
     }
 }

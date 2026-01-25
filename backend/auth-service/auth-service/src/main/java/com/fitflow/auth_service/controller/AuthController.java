@@ -18,7 +18,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // Rejestracja
+    // 1. REJESTRACJA
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserRegistrationDTO dto) {
         try {
@@ -29,20 +29,20 @@ public class AuthController {
         }
     }
 
-    // Logowanie (NOWE)
+    // 2. LOGOWANIE
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequestDTO dto) {
         try {
             String token = authService.login(dto);
-            return ResponseEntity.ok(token); // Zwracamy token JWT
+            return ResponseEntity.ok(token);
         } catch (RuntimeException e) {
             return ResponseEntity.status(403).body(e.getMessage());
         }
     }
 
-    // Pobieranie szczegółów użytkownika po ID
+    // 3. POBIERANIE UŻYTKOWNIKA PO ID (Wymagane przez Gym-Operations)
     @GetMapping("/users/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
         try {
             User user = authService.getUserById(id);
             return ResponseEntity.ok(user);
@@ -51,14 +51,14 @@ public class AuthController {
         }
     }
 
-    // Pobieranie listy dostępnych trenerów
+    // 4. POBIERANIE LISTY TRENERÓW (Do żółtego panelu w React)
     @GetMapping("/trainers")
-    public ResponseEntity<?> getAvailableTrainers() {
+    public ResponseEntity<List<TrainerDTO>> getAvailableTrainers() {
         try {
             List<TrainerDTO> trainers = authService.getTrainersList();
             return ResponseEntity.ok(trainers);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Błąd podczas pobierania listy trenerów");
+            return ResponseEntity.status(500).build();
         }
     }
 }

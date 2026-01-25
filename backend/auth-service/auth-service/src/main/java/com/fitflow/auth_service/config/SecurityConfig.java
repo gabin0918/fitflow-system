@@ -19,12 +19,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // Lista otwartych drzwi:
-                        .requestMatchers(
-                                "/api/auth/**",       // Rejestracja i logowanie
-                                "/v3/api-docs/**",    // Dane dla Swaggera
-                                "/swagger-ui/**",     // Wygląd Swaggera
-                                "/swagger-ui.html"    // Strona startowa Swaggera
-                        ).permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/users/**", "/api/auth/trainers",    "/api/auth/profile/**").permitAll()
                         .anyRequest().authenticated() // Wszystko inne wymaga logowania
                 );
 
@@ -35,4 +30,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
