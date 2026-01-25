@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from './api';
 import ProfilePage from './ProfilePage';
+import MembershipPanel from './MembershipPanel';
 
 function App() {
   const [formData, setFormData] = useState({ email: '', password: '', firstName: '', lastName: '', isTrainer: false });
@@ -12,7 +13,9 @@ function App() {
   const [isTrainer, setIsTrainer] = useState(false);
   const [newClass, setNewClass] = useState({ name: '', trainerId: null, dateTime: '', capacity: 20 });
   const [showProfile, setShowProfile] = useState(false);
+  const [showMembership, setShowMembership] = useState(false);
   const [trainers, setTrainers] = useState([]);
+  const [userId, setUserId] = useState(null);
 
   const fetchData = () => {
     if (token) {
@@ -20,6 +23,12 @@ function App() {
         // Dekodujemy token, aby sprawdzić role
         const payload = JSON.parse(atob(token.split('.')[1]));
         console.log("Zawartość Twojego tokena:", payload);
+
+        // Zapisz userId
+        if (payload.userId) {
+          setUserId(payload.userId);
+        }
+
         if (payload.roles && payload.roles.includes('ROLE_TRAINER')) {
           setIsTrainer(true);
         }
@@ -97,11 +106,28 @@ function App() {
       return <ProfilePage token={token} setToken={setToken} setShowProfile={setShowProfile} />;
     }
 
+    if (showMembership) {
+      return (
+        <div>
+          <div style={{ padding: '20px', background: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
+            <button
+              onClick={() => setShowMembership(false)}
+              style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+            >
+              ← Powrót do Dashboard
+            </button>
+          </div>
+          <MembershipPanel userId={userId} />
+        </div>
+      );
+    }
+
     return (
       <div style={{ padding: '20px', fontFamily: 'Arial' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1>FitFlow Dashboard</h1>
             <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setShowMembership(true)} style={{ padding: '10px 20px', background: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Mój Karnet</button>
               <button onClick={() => setShowProfile(true)} style={{ padding: '10px 20px', background: '#17a2b8', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Mój Profil</button>
               <button onClick={() => { localStorage.removeItem('token'); setToken(null); setIsTrainer(false); }} style={{ padding: '10px 20px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>Wyloguj</button>
             </div>
