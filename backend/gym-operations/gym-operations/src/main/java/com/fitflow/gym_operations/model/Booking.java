@@ -28,8 +28,14 @@ public class Booking {
 
     private LocalDateTime bookingDate; // Kiedy dokonano rezerwacji
 
+    @Column(nullable = false)
+    private String status; // Wartości: CONFIRMED, CANCELLED, PENDING
+
     @PrePersist
     protected void onCreate() {
         bookingDate = LocalDateTime.now(); // Automatycznie ustaw datę przy zapisie
+        if (this.status == null) {
+            this.status = "CONFIRMED"; // Domyślny status
+        }
     }
 }
